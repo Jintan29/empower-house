@@ -29,6 +29,8 @@ import Route from '@ioc:Adonis/Core/Route'
 //   Route.post('/create', 'UserController.create')
 // }
 
+// Branch ใหม่ไอ้สัด
+
 // * TEST *
 function register(){
     Route.post('/create','UserController.create')
