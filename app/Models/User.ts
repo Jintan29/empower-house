@@ -35,6 +35,27 @@ export default class User extends Model<DataType, FindType, CreateType, UpdateTy
   // }
 
   public async create(data: CreatePayloadType): Promise<DataType> {
+
+    // ตรวจสอบว่าอีเมลนี้มีอยู่ในฐานข้อมูลแล้วหรือไม่
+    
+    const existingUserEmail = await this.model.findFirst({
+      where: {
+        email: data.email,
+      },
+    })
+    if (existingUserEmail) {
+      throw new Error('Email already exists')
+    }
+
+    const existingUsername = await this.model.findFirst({
+      where: {
+        username: data.username,
+      },
+    })
+    if (existingUsername) {
+      throw new Error('Username already exists')
+    }
+
     data.password = await Hash.make(data.password)
     // data.fullName = `${data.firstName} ${data.lastName}`.trim()
     const createdData = await this.model.create({
