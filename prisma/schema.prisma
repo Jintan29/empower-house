@@ -1,33 +1,46 @@
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
+
 generator client {
     provider = "prisma-client-js"
 }
 
+model ApiToken {
+    id         Int       @id @default(autoincrement())
+    userId     Int
+    user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    name       String
+    type       String
+    token      String    @unique @db.VarChar(64)
+    expires_at DateTime? @db.Timestamptz()
+    created_at DateTime  @db.Timestamptz()
+}
+
 model User {
-    id    Int     @id @default(autoincrement())
-    email String  @unique
-    username String @unique
-    name  String?
-    password String 
-    role  String
-    post Post[]
-    profile Profile[]
+    id          Int        @id @default(autoincrement())
+    email       String     @unique
+    username    String     @unique
+    name        String?
+    password    String
+    role        String
+    rememberMeToken String?
+    post        Post[]
+    profile      Profile[]
+    apiToken    ApiToken[]
 }
 
 model Post {
-    id         Int @id @default(autoincrement())
+    id         Int    @id @default(autoincrement())
     content    String
     createById Int
-    createBy  User @relation(fields: [createById],references: [id])
-    
+    createBy   User   @relation(fields: [createById], references: [id])
 }
 
 model Profile {
-    id Int @id @default(autoincrement())
-    img String?
+    id     Int     @id @default(autoincrement())
+    img    String?
     userId Int
-    user  User @relation(fields: [userId],references: [id])
+    user   User    @relation(fields: [userId], references: [id])
 }

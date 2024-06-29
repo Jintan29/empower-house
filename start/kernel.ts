@@ -11,6 +11,7 @@
 
 import Server from '@ioc:Adonis/Core/Server'
 
+
 /*
 |--------------------------------------------------------------------------
 | Global middleware
