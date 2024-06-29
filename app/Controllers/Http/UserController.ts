@@ -12,8 +12,59 @@ export default class UsersController {
     this.userModel = new User();
   }
 
-  //เอาไว้เทสเฉยๆ
-  public index() {
+  public async get({ request }: HttpContextContract) {
+    // PREPARE OPTIONS
+    const { options, search } = request.qs()
+
+    // PREPARE SEARCH
+    if (search) {
+      options.where = {
+        fullName: {
+          contains: search,
+          mode: 'insensitive',
+        },
+      }
+    }
+
+    // FETCH
+    const data = await this.userModel.getAll(options)
+    return data
+  }
+
+  public async getById({ request, params }: HttpContextContract) {
+    // PREPARE OPTIONS
+    const { options } = request.qs()
+
+    // PREPARE DATA
+    const { id } = params
+
+    // FETCH
+    const data = await this.userModel.getById(parseInt(id), options)
+    return data
+  }
+
+  public async create({ request, response }: HttpContextContract) {
+
+    // ตรวจสอบความถูกต้องของข้อมูล
+    const validateData = await request.validate(CreateValidator);
+
+    // Create
+    const createdData = await this.userModel.create(
+      validateData as Prisma.UserCreateInput
+    );
+
+    return response.status(201).send(createdData);
+  }
+  
+  public async delete({ params}: HttpContextContract) {
+
+    const { id } = params
+    return await this.userModel.delete(parseInt(id))
+  }
+
+
+   //เอาไว้เทสเฉยๆ
+   public index() {
     return "JJ Controller";
   }
 
@@ -43,18 +94,5 @@ export default class UsersController {
     return createdUser;
 
     // return request.body()    ต้องการ retuen query string(?)
-  }
-
-  public async create({ request, response }: HttpContextContract) {
-
-    // ตรวจสอบความถูกต้องของข้อมูล
-    const validateData = await request.validate(CreateValidator);
-
-    // Create
-    const createdData = await this.userModel.create(
-      validateData as Prisma.UserCreateInput
-    );
-
-    return response.status(201).send(createdData);
   }
 }
